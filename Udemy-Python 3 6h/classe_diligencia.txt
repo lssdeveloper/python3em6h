@@ -1,0 +1,51 @@
+CRIAR UMA APPLICAÇÃO DE NOME DILIGENCIAS
+$ python manage.py startapp diligencias
+
+REGISTRAR A APLICAÇÃO NO DJANGO
+INSTALLED_APPS = [
+	'''
+	'django.contrib.staticfiles',
+	'diligencias',
+]
+
+CRIAR O MODELO DILIGENCIAS no arquivo diligencias/models.py
+
+from django import models
+from enderecos.models import Endereco
+from pessoas.models import Pessoa
+
+class Diligencia(models.Model):
+
+	nome = models.CharField(max_length=255, null=False, blank=False)
+	data_realizacao = models.DateField(null=False, blank=False)
+	mandado = models.FileField(upload_to='mandados/', null=True, blank=True)
+	relatorio = models.FileField(upload_to='relatorios/', null=True, blank=True)
+	dinheiro_apreendido = models.DecimalField(max_digits=15, decimal_places=2)
+	obs = models.TextField()
+	endereco = models.ForeignKey(Endereco, blank=False, null=False, on_delete=models.CASCADE) #MUITOS PARA UM
+	#UMA DILIGÊNCIA PODE PRENDER UMA OU MAIS PESSOAS
+	pessoa = models.ManyToManyFields(Pessoa, blank=True)
+
+	class Meta:
+		verbose_name = 'Diligência'	
+		verbose_name_plural = 'Diligências'
+
+	def __str__(self):
+		return self.nome
+
+
+REGISTRAR A CLASSE DILIGENCIA/ADMIN.PY
+
+from django.contrib import admin
+from diligencias.models import Diligencia
+
+admin.site.register(Diligencia)
+
+CRIAR A MIGRAÇÃO
+python manage.py makemigrations
+
+CRIAR NO BANCO
+python manage.py migrate
+
+SUBIR O SERVIDOR
+python manage.py runserver
